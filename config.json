@@ -1,5 +1,5 @@
 {
-  "name": "Build your own!",
+  "name": "Modified Payment List",
   "short_description": "Extension building guide",
   "tile": "/paylistmod/static/bitcoin-extension.png",
   "min_lnbits_version": "1.0.0",
