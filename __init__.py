@@ -1,16 +1,17 @@
 import asyncio
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from loguru import logger
 
 from .crud import db
 from .tasks import wait_for_paid_invoices
-from .views import paylistmod_ext_generic
-from .views_api import paylistmod_ext_api
+from .views import paylistmod_ext
+from .views_api import api_router
+from lnbits.extensions import Extension
+from lnbits.decorators import check_user_exists
 
 paylistmod_ext: APIRouter = APIRouter(prefix="/paylistmod", tags=["paylistmod"])
-paylistmod_ext.include_router(paylistmod_ext_generic)
-paylistmod_ext.include_router(paylistmod_ext_api)
+paylistmod_ext.include_router(paylistmod_ext)
 
 paylistmod_static_files = [
     {
@@ -20,6 +21,14 @@ paylistmod_static_files = [
 ]
 
 scheduled_tasks: list[asyncio.Task] = []
+
+paylistmod = Extension(
+    name="paylistmod",
+    static_folder="static",
+    template_folder="templates",
+    view_func=paylistmod_ext,
+    api_router=api_router,
+)
 
 
 def paylistmod_stop():

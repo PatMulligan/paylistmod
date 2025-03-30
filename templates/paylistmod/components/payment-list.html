@@ -1,0 +1,107 @@
+<template id="payment-list">
+  <div>
+    <div class="row q-col-gutter-md">
+      <div class="col-12 col-md-4">
+        <q-input
+          filled
+          dense
+          v-model="paymentsTable.search"
+          :label="$t('search')"
+          clearable
+        >
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </div>
+      <div class="col-12 col-md-4">
+        <q-select
+          filled
+          dense
+          v-model="searchStatus"
+          :options="[
+            { label: this.$t('success'), value: 'success' },
+            { label: this.$t('pending'), value: 'pending' },
+            { label: this.$t('failed'), value: 'failed' },
+            { label: this.$t('incoming'), value: 'incoming' },
+            { label: this.$t('outgoing'), value: 'outgoing' }
+          ]"
+          :label="$t('filter')"
+          multiple
+          use-chips
+          @update:model-value="handleFilterChanged"
+        />
+      </div>
+      <div class="col-12 col-md-4">
+        <q-btn
+          unelevated
+          color="primary"
+          :label="$t('export_csv')"
+          @click="exportCSV(true)"
+        />
+      </div>
+    </div>
+
+    <div class="row q-col-gutter-md q-mt-md">
+      <div class="col-12 col-md-6">
+        <q-input
+          filled
+          dense
+          v-model="searchDate"
+          :label="$t('date_range')"
+          type="date"
+          @update:model-value="searchByDate"
+        />
+      </div>
+      <div class="col-12 col-md-6">
+        <q-btn
+          unelevated
+          color="primary"
+          :label="$t('clear_date')"
+          @click="clearDateSeach"
+        />
+      </div>
+    </div>
+
+    <div class="row q-col-gutter-md q-mt-md">
+      <div class="col-12">
+        <q-table
+          :rows="filteredPayments"
+          :columns="paymentsTable.columns"
+          :pagination="paymentsTable.pagination"
+          :loading="paymentsTable.loading"
+          :row-key="paymentTableRowKey"
+          flat
+          bordered
+          @request="fetchPayments"
+        >
+          <template v-slot:body="props">
+            <q-tr :props="props">
+              <q-td key="time" :props="props">
+                <div class="row items-center">
+                  <div class="col">
+                    <div v-text="props.row.memo"></div>
+                    <div class="text-caption" v-text="props.row.date"></div>
+                  </div>
+                </div>
+              </q-td>
+              <q-td key="amount" :props="props">
+                <div class="row items-center justify-end">
+                  <div class="col-auto">
+                    <span
+                      :class="{
+                        'text-positive': props.row.amount > 0,
+                        'text-negative': props.row.amount < 0
+                      }"
+                      v-text="walletFormatBalance(props.row.amount)"
+                    ></span>
+                  </div>
+                </div>
+              </q-td>
+            </q-tr>
+          </template>
+        </q-table>
+      </div>
+    </div>
+  </div>
+</template> 

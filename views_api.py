@@ -2,9 +2,10 @@ from http import HTTPStatus
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException
-from lnbits.decorators import require_invoice_key
+from lnbits.decorators import require_invoice_key, check_user_exists
 
 from .models import Example
+from . import paylistmod_ext
 
 paylistmod_ext_api = APIRouter()
 
@@ -33,3 +34,9 @@ async def api_get_vetted():
             "https://raw.githubusercontent.com/lnbits/lnbits-extensions/main/README.md"
         )
         return resp.text
+
+
+@paylistmod_ext_api.get("/api/v1/payments")
+async def api_get_payments(user=Depends(check_user_exists)):
+    # We'll use the core wallet's payment data
+    return {"status": "ok"}
